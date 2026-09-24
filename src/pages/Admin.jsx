@@ -1,5 +1,7 @@
 import { useState } from "react";
 
+const API_URL = "https://ecradevbackend1.vercel.app";
+
 function Admin() {
   const [token, setToken] = useState("");
   const [messages, setMessages] = useState([]);
@@ -13,11 +15,11 @@ function Admin() {
 
     try {
       const response = await fetch(
-        "http://ecradevbackend1.vercel.app/api/messages",
+        `${API_URL}/api/messages`,
         {
           headers: {
-            Authorization: `Bearer ${adminToken}`
-          }
+            Authorization: `Bearer ${adminToken}`,
+          },
         }
       );
 
@@ -25,7 +27,6 @@ function Admin() {
 
       if (!response.ok) {
         setError(data.message || "Unable to load messages.");
-        setLoading(false);
         return;
       }
 
@@ -50,6 +51,7 @@ function Admin() {
     setLoggedIn(false);
     setError("");
   };
+
   const deleteMessage = async (messageId) => {
     const confirmed = window.confirm(
       "Are you sure you want to delete this message?"
@@ -59,14 +61,16 @@ function Admin() {
       return;
     }
 
+    setError("");
+
     try {
       const response = await fetch(
-        `http://ecradevbackend1.vercel.app/api/messages/${messageId}`,
+        `${API_URL}/api/messages/${messageId}`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -82,12 +86,12 @@ function Admin() {
           (message) => message.id !== messageId
         )
       );
-
     } catch (error) {
       console.error(error);
       setError("Could not connect to the server.");
     }
   };
+
   if (!loggedIn) {
     return (
       <div className="admin-page">
@@ -130,16 +134,13 @@ function Admin() {
 
   return (
     <div className="admin-page">
-
       <div className="admin-header">
-
         <div>
           <p className="admin-brand">ECRA DEV</p>
           <h1>Dashboard</h1>
         </div>
 
         <div className="admin-actions">
-
           <button
             className="btn secondary"
             onClick={() => fetchMessages()}
@@ -154,13 +155,10 @@ function Admin() {
           >
             Logout
           </button>
-
         </div>
-
       </div>
 
       <div className="admin-stats">
-
         <div className="stat-card">
           <span>Total Messages</span>
           <strong>{messages.length}</strong>
@@ -172,50 +170,43 @@ function Admin() {
           <strong>
             {messages.length > 0
               ? new Date(
-                messages[0].created_at
-              ).toLocaleDateString()
+                  messages[0].created_at
+                ).toLocaleDateString()
               : "None"}
           </strong>
         </div>
-
       </div>
 
       <div className="messages-container">
-
         <div className="messages-title">
           <div>
-            <p className="admin-brand">
-              INBOX
-            </p>
-
+            <p className="admin-brand">INBOX</p>
             <h2>Contact Messages</h2>
           </div>
         </div>
 
+        {error && (
+          <p className="admin-error">
+            {error}
+          </p>
+        )}
+
         {messages.length === 0 ? (
-
           <div className="empty-messages">
-
             <h2>No messages yet</h2>
 
             <p>
-              Messages submitted through your
-              portfolio will appear here.
+              Messages submitted through your portfolio
+              will appear here.
             </p>
-
           </div>
-
         ) : (
-
           messages.map((message) => (
-
             <article
               className="message-card"
               key={message.id}
             >
-
               <div className="message-header">
-
                 <div>
                   <h3>{message.name}</h3>
 
@@ -229,32 +220,26 @@ function Admin() {
                     message.created_at
                   ).toLocaleString()}
                 </span>
-
               </div>
 
               <div className="message-body">
-
-                <p>
-                  {message.message}
-                </p>
-
+                <p>{message.message}</p>
               </div>
+
               <div className="message-actions">
                 <button
                   className="delete-btn"
-                  onClick={() => deleteMessage(message.id)}
+                  onClick={() =>
+                    deleteMessage(message.id)
+                  }
                 >
                   Delete
                 </button>
               </div>
             </article>
-
           ))
-
         )}
-
       </div>
-
     </div>
   );
 }
