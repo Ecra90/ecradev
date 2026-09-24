@@ -24,7 +24,7 @@ function Contact() {
     setStatus("");
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/contact", {
+      const response = await fetch("https://ecradevbackend1.vercel.app/api/contact", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
