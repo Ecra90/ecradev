@@ -6,7 +6,7 @@ function Projects() {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    fetch("http://https://ecradevbackend1.vercel.app/api/projects")
+    fetch("http://ecradevbackend1.vercel.app/api/projects")
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch projects");

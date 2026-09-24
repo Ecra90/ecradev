@@ -13,7 +13,7 @@ function Admin() {
 
     try {
       const response = await fetch(
-        "http://https://ecradevbackend1.vercel.app/api/messages",
+        "http://ecradevbackend1.vercel.app/api/messages",
         {
           headers: {
             Authorization: `Bearer ${adminToken}`
@@ -61,7 +61,7 @@ function Admin() {
 
     try {
       const response = await fetch(
-        `http://https://ecradevbackend1.vercel.app/api/messages/${messageId}`,
+        `http://ecradevbackend1.vercel.app/api/messages/${messageId}`,
         {
           method: "DELETE",
           headers: {
