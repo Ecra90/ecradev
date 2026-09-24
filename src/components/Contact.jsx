@@ -24,30 +24,42 @@ function Contact() {
     setStatus("");
 
     try {
-      const response = await fetch("https://ecradevbackend1.vercel.app/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
+      const response = await fetch(
+        "https://ecradevbackend1.vercel.app/api/contact",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(formData)
+        }
+      );
+
+      const contentType = response.headers.get("content-type") || "";
+
+      if (!contentType.includes("application/json")) {
+        throw new Error("Server returned an invalid response.");
+      }
 
       const data = await response.json();
 
-      if (response.ok) {
-        setStatus(data.message);
-
-        setFormData({
-          name: "",
-          email: "",
-          message: ""
-        });
-      } else {
+      if (!response.ok) {
         setStatus(data.message || "Something went wrong.");
+        return;
       }
+
+      setStatus(data.message || "Your message has been sent successfully!");
+
+      setFormData({
+        name: "",
+        email: "",
+        message: ""
+      });
     } catch (error) {
-      console.error(error);
-      setStatus("Could not connect to the server.");
+      console.error("Contact form error:", error);
+      setStatus(
+        "Could not connect to the server. Please try again later."
+      );
     } finally {
       setLoading(false);
     }
@@ -56,14 +68,12 @@ function Contact() {
   return (
     <section id="contact" className="section contact">
       <div className="section-container">
-
         <div className="section-heading">
           <p>GET IN TOUCH</p>
           <h2>Let's Work Together</h2>
         </div>
 
         <div className="contact-content">
-
           <div className="contact-info">
             <h3>Have a project in mind?</h3>
 
@@ -78,7 +88,6 @@ function Contact() {
           </div>
 
           <form className="contact-form" onSubmit={handleSubmit}>
-
             <input
               type="text"
               name="name"
@@ -119,9 +128,7 @@ function Contact() {
                 {status}
               </p>
             )}
-
           </form>
-
         </div>
       </div>
     </section>
