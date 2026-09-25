@@ -9,7 +9,7 @@ function Admin() {
   const [loading, setLoading] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
 
-  const fetchMessages = async (adminToken = token) => {
+  const fetchMessages = async (adminToken) => {
     setLoading(true);
     setError("");
 
@@ -17,24 +17,29 @@ function Admin() {
       const response = await fetch(
         `${API_URL}/api/messages`,
         {
+          method: "GET",
           headers: {
             Authorization: `Bearer ${adminToken}`,
-          },
+            Accept: "application/json"
+          }
         }
       );
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Unable to load messages.");
+        setError(data.message || "Invalid admin token.");
+        setLoggedIn(false);
         return;
       }
 
       setMessages(data.messages || []);
       setLoggedIn(true);
     } catch (error) {
-      console.error(error);
-      setError("Could not connect to the server.");
+      console.error("Admin API error:", error);
+      setError(
+        "Could not connect to the server. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -42,7 +47,13 @@ function Admin() {
 
   const login = async (e) => {
     e.preventDefault();
-    await fetchMessages(token);
+
+    if (!token.trim()) {
+      setError("Please enter your admin token.");
+      return;
+    }
+
+    await fetchMessages(token.trim());
   };
 
   const logout = () => {
@@ -50,6 +61,10 @@ function Admin() {
     setMessages([]);
     setLoggedIn(false);
     setError("");
+  };
+
+  const refresh = async () => {
+    await fetchMessages(token);
   };
 
   const deleteMessage = async (messageId) => {
@@ -70,7 +85,8 @@ function Admin() {
           method: "DELETE",
           headers: {
             Authorization: `Bearer ${token}`,
-          },
+            Accept: "application/json"
+          }
         }
       );
 
@@ -87,7 +103,7 @@ function Admin() {
         )
       );
     } catch (error) {
-      console.error(error);
+      console.error("Delete error:", error);
       setError("Could not connect to the server.");
     }
   };
@@ -110,6 +126,7 @@ function Admin() {
               placeholder="Admin Token"
               value={token}
               onChange={(e) => setToken(e.target.value)}
+              autoComplete="current-password"
               required
             />
 
@@ -143,7 +160,7 @@ function Admin() {
         <div className="admin-actions">
           <button
             className="btn secondary"
-            onClick={() => fetchMessages()}
+            onClick={refresh}
             disabled={loading}
           >
             {loading ? "Refreshing..." : "Refresh"}
